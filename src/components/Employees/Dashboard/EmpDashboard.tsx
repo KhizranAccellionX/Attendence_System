@@ -12,14 +12,17 @@ import { AppHeader } from "../../Admin/Dashboard/AppHeader";
 import { DashContent } from "./DashContent";
 import { Profile } from "./Profile";
 import { LeaApp } from "../Leave/LeaApp";
+import { useNavigate } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
-const EmpDashboard: React.FC = () => {
+const EmpDashboard: React.FC<{children: React.ReactNode}> = ({children}) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const navigate = useNavigate();
 
   return (
     <Layout className="h-screen">
@@ -50,16 +53,19 @@ const EmpDashboard: React.FC = () => {
                 key: "1",
                 icon: <UserOutlined />,
                 label: "Dashboard",
+                onClick: () => navigate("/employee/dashboard")
               },
               {
                 key: "2",
                 icon: <VideoCameraOutlined />,
                 label: "Profile",
+                onClick: () => navigate("/employee/profile")
               },
               {
                 key: "3",
                 icon: <UploadOutlined />,
                 label: "Leave Applications",
+                onClick: () => navigate("/employee/leave-applications")
               },
             ]}
           />
@@ -73,9 +79,7 @@ const EmpDashboard: React.FC = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            {/* <DashContent/> */}
-            {/* <Profile/> */}
-            <LeaApp/>
+            {children}
           </Content>
         </Layout>
       </Layout>

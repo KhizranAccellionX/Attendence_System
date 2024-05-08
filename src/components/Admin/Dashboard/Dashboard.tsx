@@ -11,14 +11,17 @@ import { Typography } from "@mui/material";
 import { AppHeader } from "./AppHeader";
 import { AppContent } from "./AppContent";
 import { AddUser } from "../User/AddUser";
+import { useNavigate } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
-const App: React.FC = () => {
+const App: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const navigate = useNavigate();
 
   return (
     <Layout className="h-screen">
@@ -49,26 +52,31 @@ const App: React.FC = () => {
                 key: "1",
                 icon: <UserOutlined />,
                 label: "Dashboard",
+                onClick: () => navigate("/dashboard")
               },
               {
                 key: "2",
                 icon: <VideoCameraOutlined />,
                 label: "Add Employee",
+                onClick: () => navigate("/dashboard/add-employee")
               },
               {
                 key: "3",
                 icon: <UploadOutlined />,
                 label: "Employees",
+                onClick: () => navigate("/dashboard/employees")
               },
               {
                 key: "4",
                 icon: <UploadOutlined />,
                 label: "Attendence Report",
+                onClick: () => navigate("/dashboard/attendence-report")
               },
               {
                 key: "5",
                 icon: <UploadOutlined />,
                 label: "Leave Applications",
+                onClick: () => navigate("/dashboard/leave-applications")
               },
             ]}
           />
@@ -82,8 +90,7 @@ const App: React.FC = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            {/* <AppContent /> */}
-            <AddUser />
+            {children}
           </Content>
         </Layout>
       </Layout>

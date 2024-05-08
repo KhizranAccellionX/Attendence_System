@@ -1,6 +1,7 @@
 import { Col, DatePicker, Row, Typography } from "antd";
+import axios from "axios";
 import type { FormProps } from "antd";
-import { Button, Checkbox, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select } from "antd";
 const { Title } = Typography;
 
 type FieldType = {
@@ -9,11 +10,23 @@ type FieldType = {
   lastName?: string;
   email?: string;
   password?: string;
-  confirmPassword?: string;
+  cnic?: number;
+  designation?: string;
+  salary?: number;
+  dob?: Date;
+  joiningDate?: Date;
 };
 
-const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-  console.log("Success:", values);
+const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/users",
+      values
+    );
+    console.log("Success:", response.data);
+  } catch (error) {
+    console.error("Failed:", error);
+  }
 };
 
 const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
@@ -54,14 +67,12 @@ export const AddUser = () => {
           ]}
         >
           <Select
-            defaultValue="lucy"
+            defaultValue="Select role to Add User"
             //   style={{ width: 120 }}
             onChange={handleChange}
             options={[
-              { value: "jack", label: "Jack" },
-              { value: "lucy", label: "Lucy" },
-              { value: "Yiminghe", label: "yiminghe" },
-              { value: "disabled", label: "Disabled", disabled: true },
+              { value: "admin", label: "Admin" },
+              { value: "user", label: "User" },
             ]}
           />
         </Form.Item>
@@ -83,6 +94,78 @@ export const AddUser = () => {
             </Form.Item>
           </Col>
         </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item<FieldType>
+              label="CNIC"
+              name="cnic"
+              rules={[{ required: true, message: "Please input CNIC!" }]}
+            >
+              <Input placeholder="xxxxx-xxxxxxx-x" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item<FieldType>
+              label="Select User Designation"
+              name="designation"
+              rules={[
+                { required: true, message: "Please Select one of the value!" },
+              ]}
+            >
+              <Select
+                defaultValue="Select User designation"
+                //   style={{ width: 120 }}
+                onChange={handleChange}
+                options={[
+                  { value: "Intern", label: "Intern" },
+                  {
+                    value: "Associate Software Enginner",
+                    label: "Associate Software Engineer",
+                  },
+                  { value: "Software Engineer", label: "Software Engineer" },
+                  {
+                    value: "Senior Software Enginner",
+                    label: "Senior Software Enginner",
+                  },
+                  { value: "Principal", label: "Principal" },
+                  { value: "COO", label: "COO" },
+                  { value: "CTO", label: "CTO" },
+                ]}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item<FieldType>
+              label="Salary"
+              name="salary"
+              rules={[{ required: true, message: "Please input User Salary!" }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item<FieldType>
+              label="DOB"
+              name="dob"
+              rules={[{ required: true, message: "Please Input user dob" }]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item<FieldType>
+              label="Joining Date"
+              name="joiningDate"
+              rules={[
+                { required: true, message: "Please Input user Joining Date" },
+              ]}
+            >
+              <DatePicker />
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item<FieldType>
           label="Email"
           name="email"
@@ -95,19 +178,20 @@ export const AddUser = () => {
             <Form.Item<FieldType>
               label="Password"
               name="password"
-              rules={[
-                { required: true, message: "Please input Password!" },
-              ]}
+              rules={[{ required: true, message: "Please input Password!" }]}
             >
               <Input.Password />
             </Form.Item>
           </Col>
           <Col span={12}>
-          <Form.Item<FieldType>
+            <Form.Item<FieldType>
               label="Confirm Password"
-              name="confirmPassword"
+              name="password"
               rules={[
-                { required: true, message: "Confirm Password must be matched with Password!" },
+                {
+                  required: true,
+                  message: "Confirm Password must be matched with Password!",
+                },
               ]}
             >
               <Input.Password />

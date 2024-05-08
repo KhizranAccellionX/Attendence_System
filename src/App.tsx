@@ -10,8 +10,8 @@ function App() {
     <div>
       {/* <Login/> */}
       {/* <Dashboard /> */}
-      <EmpDashboard/>
-       {/* <SitMap/> */}
+      {/* <EmpDashboard/> */}
+       <SitMap/>
     </div>
   );
 }
