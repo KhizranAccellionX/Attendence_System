@@ -171,7 +171,7 @@ export const AddUser = () => {
           name="email"
           rules={[{ required: true, message: "Please input your Email!" }]}
         >
-          <Input.Password />
+          <Input />
         </Form.Item>
         <Row gutter={16}>
           <Col span={12}>

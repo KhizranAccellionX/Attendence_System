@@ -1,24 +1,34 @@
 import { FaFacebookF } from "react-icons/fa6";
 import { Typography } from "@mui/material";
 import type { FormProps } from "antd";
+import axios from "axios";
 import { Button, Form, Input, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const Login = () => {
   type FieldType = {
-    username?: string;
+    email?: string;
     password?: string;
-    remember?: string;
   };
-  const navigate= useNavigate()
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log("Success:", values);
-  };
-
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
-    errorInfo
-  ) => {
-    console.log("Failed:", errorInfo);
+  const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        values
+      );
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      console.log(token); // You can store the token in localStorage and use it for authentication
+      navigate("/employee/dashboard"); // Redirect to dashboard on successful login
+    } catch (error) {
+      console.error("Login error:", error);
+      console.log(values);
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,16 +56,13 @@ export const Login = () => {
             style={{ maxWidth: 600 }}
             initialValues={{ remember: true }}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             autoComplete="off"
             className="py-8 border-2 border-purple-500"
           >
             <Form.Item<FieldType>
-              label="Username"
-              name="username"
-              rules={[
-                { required: true, message: "Please input your username!" },
-              ]}
+              label="Email"
+              name="email"
+              rules={[{ required: true, message: "Please input your Email!" }]}
             >
               <Input />
             </Form.Item>
@@ -79,7 +86,6 @@ export const Login = () => {
                   type="primary"
                   htmlType="submit"
                   className="w-full mt-4 !bg-secondary-color"
-                  onClick={()=>navigate("/dashboard")}
                 >
                   Sign In
                 </Button>
@@ -89,10 +95,18 @@ export const Login = () => {
         </div>
       </div>
       <div className=" w-1/2 bg-secondary-color flex flex-col items-center justify-center px-4 text-white">
-        <Typography variant="h2">
-          Lorem ipsum, dolor sit amet cons?
+        <Typography variant="h2">Lorem ipsum, dolor sit amet cons?</Typography>
+        <Typography>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi
+          quibusdam non tenetur magnam ullam culpa dolores, dicta temporibus
+          impedit atque vero sequi praesentium, quasi et similique natus
+          distinctio pariatur! Voluptate unde numquam illo dolorem placeat
+          saepe, ipsa delectus ad reiciendis odit asperiores nihil consequatur
+          alias debitis enim repudiandae perspiciatis quo vel libero voluptates
+          temporibus quas explicabo. Velit natus, unde exercitationem
+          praesentium nihil assumenda qui placeat alias odit doloremque porro ad
+          in neque!
         </Typography>
-        <Typography>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi quibusdam non tenetur magnam ullam culpa dolores, dicta temporibus impedit atque vero sequi praesentium, quasi et similique natus distinctio pariatur! Voluptate unde numquam illo dolorem placeat saepe, ipsa delectus ad reiciendis odit asperiores nihil consequatur alias debitis enim repudiandae perspiciatis quo vel libero voluptates temporibus quas explicabo. Velit natus, unde exercitationem praesentium nihil assumenda qui placeat alias odit doloremque porro ad in neque!</Typography>
         <Typography>Learn More &#8594;</Typography>
       </div>
     </div>

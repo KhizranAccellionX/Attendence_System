@@ -1,10 +1,12 @@
-import { Typography, DatePicker, Divider, Row, Card } from "antd";
+import { Typography, DatePicker, Divider, Row, Card, message } from "antd";
 import { FaArrowRightToBracket } from "react-icons/fa6";
 import { FaArrowRightFromBracket } from "react-icons/fa6";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
 import { LineChart } from "@mui/x-charts/LineChart";
+import axios from "axios";
+import { useEffect, useState } from "react";
 const { Title } = Typography;
 function PieCenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
@@ -29,6 +31,38 @@ const StyledText = styled("text")(({ theme }) => ({
 }));
 
 export const DashContent = () => {
+  const [hourCard, setHourCard] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const time = new Date();
+  useEffect(() => {
+    // Update the current time every second
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array ensures the effect runs only once
+
+  const handleCheckIn = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/attendance/check-in",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Send the JWT token stored in localStorage
+          },
+        }
+      );
+      console.log(response.data);
+      message.success("You checked In successfully");
+      setHourCard(true);
+    } catch (error) {
+      message.error("You already checked in"); 
+    }
+  };
+  
   return (
     <div>
       <div className="bg-slate-200 pb-4">
@@ -42,7 +76,7 @@ export const DashContent = () => {
         </div>
         <Divider />
         <Row className=" flex justify-center">
-          <Card className="mr-2 bg-green-100">
+          <Card className="mr-2 bg-green-100" onClick={handleCheckIn}>
             <FaArrowRightToBracket />
             <Title level={5}>9: 09 A.M</Title>
             <span>Checked In</span>
@@ -57,6 +91,15 @@ export const DashContent = () => {
             <Title level={5}>9: 09 A.M</Title>
             <span>Working hours</span>
           </Card>
+          {hourCard ? (
+            <Card className="mr-2 bg-blue-100">
+              <FaArrowRightToBracket />
+              <Title level={5}>{currentTime.toLocaleTimeString()}</Title>
+              <span>Working hours</span>
+            </Card>
+          ) : (
+            ""
+          )}
         </Row>
       </div>
       <div className="flex items-center justify-around bg-slate-200 rounded-md mt-4 p-2">
