@@ -62,6 +62,24 @@ export const DashContent = () => {
       message.error("You already checked in"); 
     }
   };
+  const handleCheckOut = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/attendance/check-out",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Send the JWT token stored in localStorage
+          },
+        }
+      );
+      console.log(response.data);
+      message.success("You checked Out successfully");
+      setHourCard(false); // Hide the working hours card after checkout
+    } catch (error) {
+      message.error("Failed to check out");
+    }
+  };
   
   return (
     <div>
@@ -81,7 +99,7 @@ export const DashContent = () => {
             <Title level={5}>9: 09 A.M</Title>
             <span>Checked In</span>
           </Card>
-          <Card className="mr-2 bg-orange-100">
+          <Card className="mr-2 bg-orange-100" onClick={handleCheckOut}>
             <FaArrowRightFromBracket />
             <Title level={5}>9: 09 A.M</Title>
             <span>Checked Out</span>
