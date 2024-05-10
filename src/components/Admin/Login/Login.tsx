@@ -4,30 +4,29 @@ import type { FormProps } from "antd";
 import axios from "axios";
 import { Button, Form, Input, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-
+import { authLogin } from "../../../services/authLogin";
+import { fetchUserData } from "../../../services/userApis/userApis";
 export const Login = () => {
   type FieldType = {
     email?: string;
     password?: string;
   };
-  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    setLoading(true);
+  const onFinish = async (values: { email: string; password: string }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/login",
-        values
-      );
-      const token = response.data.token;
+      const token = await authLogin(values);
       localStorage.setItem("token", token);
-      console.log(token); // You can store the token in localStorage and use it for authentication
-      navigate("/employee/dashboard"); // Redirect to dashboard on successful login
+
+      const reponse = await fetchUserData();
+      console.log(reponse?.role);
+      console.log(token);
+      if (reponse?.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/employee/dashboard");
+      }
     } catch (error) {
       console.error("Login error:", error);
-      console.log(values);
-      setLoading(false);
     }
   };
 

@@ -1,17 +1,12 @@
-import React from "react";
-import "./App.css";
+import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import { PrivateMap } from "./Navigation/PrivateMap";
 import { Login } from "./components/Admin/Login/Login";
-import Dashboard from "./components/Admin/Dashboard/Dashboard";
-import EmpDashboard from "./components/Employees/Dashboard/EmpDashboard";
-import { SitMap } from "./Navigation/SitMap";
+import { AppRoutes } from "./Navigation/AppRoutes";
 
 function App() {
   return (
     <div>
-      {/* <Login/> */}
-      {/* <Dashboard /> */}
-      {/* <EmpDashboard/> */}
-       <SitMap/>
+      <AppRoutes/>
     </div>
   );
 }

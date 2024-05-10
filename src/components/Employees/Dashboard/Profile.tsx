@@ -3,32 +3,20 @@ import { FaArrowRightToBracket } from "react-icons/fa6";
 import { FaRegClock } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { fetchUserData } from "../../../services/userApis/userApis";
+import { UserData } from "../../types";
 const { Title } = Typography;
 
-interface UserData {
-    firstName: string
-  role: string;
-  designation: string;
-  email: string;
-  // Add other properties if needed
-}
 export const Profile = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/userDetails", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((response) => {
-        console.log(response.data.data.firstName);
-        setUserData(response.data.data);
-        console.log(userData);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    const fetchData = async () => {
+      const userData = await fetchUserData();
+      setUserData(userData);
+      console.log(userData);
+    };
+
+    fetchData();
   }, []);
   return (
     <div>
@@ -42,7 +30,9 @@ export const Profile = () => {
         </div>
         <Divider />
         <div className="flex p-2">
-          <Avatar size={100} className="!text-5xl">{userData?.firstName.slice(0, 1)}</Avatar>
+          <Avatar size={100} className="!text-5xl">
+            {userData?.firstName.slice(0, 1)}
+          </Avatar>
           <div className="w-2/5 ml-2">
             <Title level={2}>{userData?.firstName}</Title>
             <Row className="flex justify-between text-slate-400 font-semibold">

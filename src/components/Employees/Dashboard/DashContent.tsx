@@ -7,6 +7,10 @@ import { styled } from "@mui/material/styles";
 import { LineChart } from "@mui/x-charts/LineChart";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import {
+  CheckInApi,
+  CheckOutApi,
+} from "../../../services/attendenceApis/attendence";
 const { Title } = Typography;
 function PieCenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
@@ -34,45 +38,39 @@ export const DashContent = () => {
   const [hourCard, setHourCard] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const time = new Date();
+
   useEffect(() => {
-    // Update the current time every second
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     // Clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, []); // Empty dependency array ensures the effect runs only once
+  }, []);
+
+  useEffect(() => {
+    const checkedIn = localStorage.getItem("checkedIn");
+    checkedIn ? setHourCard(true) : setHourCard(false);
+  }, []);
 
   const handleCheckIn = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/attendance/check-in",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Send the JWT token stored in localStorage
-          },
-        }
-      );
-      console.log(response.data);
-      message.success("You checked In successfully");
+      const responseData = await CheckInApi();
       setHourCard(true);
+      console.log(responseData);
+      if (responseData.checkedIn) {
+        message.success("You CheckedIn successfully");
+        localStorage.setItem("checkedIn", responseData.checkedIn);
+      } else {
+        message.error("You already checkedIn");
+      }
     } catch (error) {
-      message.error("You already checked in"); 
+      console.log("error in checking in", error);
     }
   };
   const handleCheckOut = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/attendance/check-out",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Send the JWT token stored in localStorage
-          },
-        }
-      );
+      const response = await CheckOutApi();
       console.log(response.data);
       message.success("You checked Out successfully");
       setHourCard(false); // Hide the working hours card after checkout
@@ -80,7 +78,7 @@ export const DashContent = () => {
       message.error("Failed to check out");
     }
   };
-  
+
   return (
     <div>
       <div className="bg-slate-200 pb-4">
