@@ -2,7 +2,7 @@ import { FaFacebookF } from "react-icons/fa6";
 import { Typography } from "@mui/material";
 import type { FormProps } from "antd";
 import axios from "axios";
-import { Button, Form, Input, Divider } from "antd";
+import { Button, Form, Input, Divider, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { authLogin } from "../../../services/authLogin";
 import { fetchUserData } from "../../../services/userApis/userApis";
@@ -16,6 +16,7 @@ export const Login = () => {
     try {
       const token = await authLogin(values);
       localStorage.setItem("token", token);
+      message.success("Login successfull");
 
       const reponse = await fetchUserData();
       console.log(reponse?.role);
@@ -27,12 +28,13 @@ export const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
+      message.error("Invalid credentials")
     }
   };
 
   return (
     <div className=" h-screen w-screen px-8 py-8 flex justify-center bg-slate-200">
-      <div className=" w-1/2 border-red-600 border-2 p-8 bg-white">
+      <div className=" w-1/2 p-8 bg-white">
         <Typography variant="h4">Welcome to AccellionX</Typography>
         <div className="mt-5 flex justify-around items-center">
           <Button size="large" className="flex w-1/3">
@@ -47,7 +49,7 @@ export const Login = () => {
         <div className="mt-8">
           <Divider plain>or</Divider>
         </div>
-        <div className="border-2 border-black mt-8">
+        <div>
           <Form
             name="basic"
             labelCol={{ span: 6 }}
@@ -56,7 +58,7 @@ export const Login = () => {
             initialValues={{ remember: true }}
             onFinish={onFinish}
             autoComplete="off"
-            className="py-8 border-2 border-purple-500"
+            className="py-8"
           >
             <Form.Item<FieldType>
               label="Email"
@@ -75,7 +77,7 @@ export const Login = () => {
             >
               <Input.Password />
             </Form.Item>
-            <div className="mr-10 border-2 border-red-100">
+            <div className="mr-10">
               <Typography className="!text-sm flex justify-end text-secondary-color">
                 Forgot Password?
               </Typography>

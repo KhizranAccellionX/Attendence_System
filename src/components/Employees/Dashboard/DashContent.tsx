@@ -37,6 +37,7 @@ const StyledText = styled("text")(({ theme }) => ({
 
 export const DashContent = () => {
   const [hourCard, setHourCard] = useState(false);
+  const [action, setAction] = useState<number>(0);
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord | null>(
     null
   );
@@ -53,25 +54,22 @@ export const DashContent = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetchUserAttendance();
+      const latRes = response.data[response.data.length - 1];
       const todayDate = new Date().toISOString().substring(0, 10);
       console.log(todayDate);
       if (Array.isArray(response.data) && response.data.length > 0) {
-        console.log(response.data[response.data.length - 1]);
+        console.log(latRes);
         console.log(
-          response.data[response.data.length - 1]?.time_in
-            .toLocaleString()
-            .slice(0, 10) === todayDate
+          latRes?.time_in.toLocaleString().slice(0, 10) === todayDate
         );
-        if (
-          response.data[response.data.length - 1]?.time_in
-            .toLocaleString()
-            .slice(0, 10) === todayDate
-        ) {
-          setAttendanceData(response.data[response.data.length - 1]);
+        if (latRes?.time_in.toLocaleString().slice(0, 10) === todayDate) {
+          setAttendanceData(latRes);
           console.log(attendanceData);
           console.log(attendanceData?.time_in.toLocaleString().slice(0, 10));
           if (attendanceData?.time_in && !attendanceData?.time_out) {
             setHourCard(true);
+          } else if (attendanceData?.time_in && attendanceData?.time_out) {
+            setHourCard(false);
           } else {
             setHourCard(false);
           }
@@ -79,20 +77,16 @@ export const DashContent = () => {
       }
     };
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    console.log(attendanceData);
-  }, []);
+  }, [action]);
 
   const handleCheckIn = async () => {
     try {
       const responseData = await CheckInApi();
-      setHourCard(true);
       console.log(responseData);
       if (responseData.checkedIn) {
         message.success("You CheckedIn successfully");
         localStorage.setItem("checkedIn", responseData.checkedIn);
+        setAction((prev) => prev + 1);
       } else {
         message.error("You already checkedIn");
       }
@@ -105,6 +99,7 @@ export const DashContent = () => {
       const response = await CheckOutApi();
       console.log(response.data);
       message.success("You checked Out successfully");
+      setAction((prev) => prev + 1);
       setHourCard(false);
     } catch (error) {
       message.error("Failed to check out");

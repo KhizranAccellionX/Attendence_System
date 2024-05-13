@@ -1,9 +1,10 @@
-import { Typography, Divider, Row, Avatar, Col, Table } from "antd";
+import { Typography, Divider, Row, Avatar, Col, Table, Card } from "antd";
 import { FaArrowRightToBracket } from "react-icons/fa6";
 import { FaRegClock } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { fetchUserData } from "../../../services/userApis/userApis";
 import { UserData } from "../../types";
+import { fetchUserAttendance } from "../../../services/attendenceApis/attendence";
 const { Title } = Typography;
 
 export const Profile = () => {
@@ -17,6 +18,23 @@ export const Profile = () => {
 
     fetchData();
   }, []);
+  const [attendanceData, setAttendanceData] = useState([]);
+
+  useEffect(() => {
+    const fetchAttendanceData = async () => {
+      try {
+        const response = await fetchUserAttendance();
+        console.log("fetched data",response.data);
+        setAttendanceData(response.data);
+      } catch (error) {
+        console.error("Error fetching user attendance:", error);
+      }
+    };
+
+    fetchAttendanceData();
+  }, []);
+  console.log(attendanceData);
+
   const dataSource = [
     {
       date: "28 May 2024",
@@ -36,37 +54,36 @@ export const Profile = () => {
       checkInTime: "8:30 A.M",
       checkOutTime: "5:30 P.M",
     },
-    // Add more data as needed
   ];
 
   const columns = [
     {
-      title: "Data",
+      title: "Attendance History",
       dataIndex: "data",
       key: "data",
       render: (text: string, record: any) => (
-        <Row className="flex justify-around border-2 border-black">
-          <Col span={6}>
-            <div className="mr-2 bg-slate-300 p-2 rounded-lg">
-              <div className="flex justify-between items-center w-full mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <Card className="bg-slate-300 p-2 rounded-lg">
+              <div className="flex justify-between items-center mb-4">
                 <span className="flex items-center">
                   <FaRegClock className="mr-1" />
-                  {record.date}
+                  {record.date.toLocaleString().slice(0, 10)}
                 </span>
                 <div className="border-2 border-white bg-white font-semibold text-slate-500 rounded-full p-1">
                   {record.status}
                 </div>
               </div>
 
-              <div className="flex justify-between items-center w-full textslate=500 mb-4">
+              <div className="flex justify-between items-center mb-4">
                 <span>Check In Time</span>
                 <span>Check Out Time</span>
               </div>
-              <div className="flex justify-between items-center w-full font-bold">
-                <span>{record.checkInTime}</span>
-                <span>{record.checkOutTime}</span>
+              <div className="flex justify-between items-center font-bold">
+                <span>{record.time_in.toLocaleString().slice(11, 19)}</span>
+                <span>{record.time_out.toLocaleString().slice(11, 19)}</span>
               </div>
-            </div>
+            </Card>
           </Col>
         </Row>
       ),
@@ -152,7 +169,7 @@ export const Profile = () => {
           </Col>
         </Row>
       </div>
-      <div className="bg-slate-200 pb-4 mt-2">
+      {/* <div className="bg-slate-200 pb-4 mt-2">
         <div className="flex justify-between bg-slate-200 p-1 rounded-md w-full">
           <div className="border-l-4 border-secondary-color h-9 flex items-center">
             <Title level={5} className="ml-2">
@@ -160,7 +177,7 @@ export const Profile = () => {
             </Title>
           </div>
         </div>
-        <Divider />
+        <Divider /> */}
         {/* <Row className="flex justify-around">
           <Col span={6}>
             <div className="mr-2 bg-slate-300 p-2 rounded-lg">
@@ -229,14 +246,13 @@ export const Profile = () => {
             </div>
           </Col>
         </Row> */}
-        <Table
-          dataSource={dataSource}
+        <Table className="mt-4"
+          dataSource={attendanceData}
           columns={columns}
           bordered
-          pagination={false}
         />
         ;
       </div>
-    </div>
+    // </div>
   );
 };
