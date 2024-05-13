@@ -1,13 +1,11 @@
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
-import { Login } from "../components/Admin/Login/Login";
-import App from "../components/Admin/Dashboard/Dashboard";
 import { AddUser } from "../components/Admin/User/AddUser";
 import { AppContent } from "../components/Admin/Dashboard/AppContent";
-import EmpDashboard from "../components/Employees/Dashboard/EmpDashboard";
 import { DashContent } from "../components/Employees/Dashboard/DashContent";
 import { Profile } from "../components/Employees/Dashboard/Profile";
 import { LeaApp } from "../components/Employees/Leave/LeaApp";
 import { Employees } from "../components/Admin/User/Employeees";
+import AppLayout from "../common/AppLayout";
 
 export const SitMap = () => {
   return (
@@ -16,49 +14,49 @@ export const SitMap = () => {
         <Route
           path="/dashboard"
           element={
-            <App>
+            <AppLayout>
               <AppContent />
-            </App>
+            </AppLayout>
           }
         />
         <Route
           path="/dashboard/add-employee"
           element={
-            <App>
+            <AppLayout>
               <AddUser />
-            </App>
+            </AppLayout>
           }
         />
         <Route
           path="/dashboard/employees"
           element={
-            <EmpDashboard>
+            <AppLayout>
               <Employees />
-            </EmpDashboard>
+            </AppLayout>
           }
         />
         <Route
           path="/employee/dashboard"
           element={
-            <EmpDashboard>
+            <AppLayout>
               <DashContent />
-            </EmpDashboard>
+            </AppLayout>
           }
         />
         <Route
           path="/employee/profile"
           element={
-            <EmpDashboard>
+            <AppLayout>
               <Profile />
-            </EmpDashboard>
+            </AppLayout>
           }
         />
         <Route
           path="/employee/leave-applications"
           element={
-            <EmpDashboard>
+            <AppLayout>
               <LeaApp />
-            </EmpDashboard>
+            </AppLayout>
           }
         />
       </Routes>

@@ -2,6 +2,7 @@ import { Col, DatePicker, Row, Typography } from "antd";
 import axios from "axios";
 import type { FormProps } from "antd";
 import { Button, Form, Input, Select } from "antd";
+import attendanceAPI from "../../../services/axios";
 const { Title } = Typography;
 
 type FieldType = {
@@ -19,9 +20,9 @@ type FieldType = {
 
 const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
   try {
-    const response = await axios.post(
-      "http://localhost:5000/api/users",
-      values
+    const response = await attendanceAPI.post(
+      `${process.env.REACT_APP_API_URL}/users`, values,
+      {}
     );
     console.log("Success:", response.data);
   } catch (error) {

@@ -5,12 +5,13 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
 import { LineChart } from "@mui/x-charts/LineChart";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import {
   CheckInApi,
   CheckOutApi,
+  fetchUserAttendance,
 } from "../../../services/attendenceApis/attendence";
+import { AttendanceRecord } from "../../types";
 const { Title } = Typography;
 function PieCenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
@@ -36,21 +37,52 @@ const StyledText = styled("text")(({ theme }) => ({
 
 export const DashContent = () => {
   const [hourCard, setHourCard] = useState(false);
+  const [attendanceData, setAttendanceData] = useState<AttendanceRecord | null>(
+    null
+  );
+
   const [currentTime, setCurrentTime] = useState(new Date());
-  const time = new Date();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
-    // Clear the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
-    const checkedIn = localStorage.getItem("checkedIn");
-    checkedIn ? setHourCard(true) : setHourCard(false);
+    const fetchData = async () => {
+      const response = await fetchUserAttendance();
+      const todayDate = new Date().toISOString().substring(0, 10);
+      console.log(todayDate);
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        console.log(response.data[response.data.length - 1]);
+        console.log(
+          response.data[response.data.length - 1]?.time_in
+            .toLocaleString()
+            .slice(0, 10) === todayDate
+        );
+        if (
+          response.data[response.data.length - 1]?.time_in
+            .toLocaleString()
+            .slice(0, 10) === todayDate
+        ) {
+          setAttendanceData(response.data[response.data.length - 1]);
+          console.log(attendanceData);
+          console.log(attendanceData?.time_in.toLocaleString().slice(0, 10));
+          if (attendanceData?.time_in && !attendanceData?.time_out) {
+            setHourCard(true);
+          } else {
+            setHourCard(false);
+          }
+        }
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    console.log(attendanceData);
   }, []);
 
   const handleCheckIn = async () => {
@@ -73,7 +105,7 @@ export const DashContent = () => {
       const response = await CheckOutApi();
       console.log(response.data);
       message.success("You checked Out successfully");
-      setHourCard(false); // Hide the working hours card after checkout
+      setHourCard(false);
     } catch (error) {
       message.error("Failed to check out");
     }
@@ -94,17 +126,29 @@ export const DashContent = () => {
         <Row className=" flex justify-center">
           <Card className="mr-2 bg-green-100" onClick={handleCheckIn}>
             <FaArrowRightToBracket />
-            <Title level={5}>9: 09 A.M</Title>
+            <Title level={5}>
+              {attendanceData?.time_in
+                ? attendanceData?.time_in.toLocaleString().slice(11, 19)
+                : "You did not checkIn"}
+            </Title>
             <span>Checked In</span>
           </Card>
           <Card className="mr-2 bg-orange-100" onClick={handleCheckOut}>
             <FaArrowRightFromBracket />
-            <Title level={5}>9: 09 A.M</Title>
+            <Title level={5}>
+              {attendanceData?.time_out
+                ? attendanceData?.time_out.toLocaleString().slice(11, 19)
+                : "Check Out after CheckIn"}
+            </Title>
             <span>Checked Out</span>
           </Card>
           <Card className="mr-2 bg-blue-100">
             <FaArrowRightToBracket />
-            <Title level={5}>9: 09 A.M</Title>
+            <Title level={5}>
+              {attendanceData?.working_hours
+                ? attendanceData?.working_hours.toLocaleString()
+                : "0"}
+            </Title>
             <span>Working hours</span>
           </Card>
           {hourCard ? (

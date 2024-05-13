@@ -1,28 +1,39 @@
-import React, { useState } from "react";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
-import { Typography } from "@mui/material";
-import { AppHeader } from "../../Admin/Dashboard/AppHeader";
-import { DashContent } from "./DashContent";
-import { Profile } from "./Profile";
-import { LeaApp } from "../Leave/LeaApp";
 import { useNavigate } from "react-router-dom";
+import { AppHeader } from "../components/Admin/Dashboard/AppHeader";
+import { adminSidebar, employeeSidebar } from "./sidebar";
+import { fetchUserData } from "../services/userApis/userApis";
 
 const { Header, Sider, Content } = Layout;
 
-const EmpDashboard: React.FC<{children: React.ReactNode}> = ({children}) => {
+const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState<string>("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchUserData();
+        if (response && response.role !== undefined) {
+          setUserRole(response.role);
+        } else {
+          setUserRole("");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const role = userRole === "admin" ? adminSidebar : employeeSidebar;
 
   return (
     <Layout className="h-screen">
@@ -48,29 +59,15 @@ const EmpDashboard: React.FC<{children: React.ReactNode}> = ({children}) => {
             theme="dark"
             mode="inline"
             defaultSelectedKeys={["1"]}
-            items={[
-              {
-                key: "1",
-                icon: <UserOutlined />,
-                label: "Dashboard",
-                onClick: () => navigate("/employee/dashboard")
-              },
-              {
-                key: "2",
-                icon: <VideoCameraOutlined />,
-                label: "Profile",
-                onClick: () => navigate("/employee/profile")
-              },
-              {
-                key: "3",
-                icon: <UploadOutlined />,
-                label: "Leave Applications",
-                onClick: () => navigate("/employee/leave-applications")
-              },
-            ]}
+            items={role.map((menuitem) => ({
+              key: menuitem.key,
+              icon: <menuitem.icon />,
+              label: menuitem.label,
+              onClick: () => navigate(menuitem.path),
+            }))}
           />
         </Sider>
-        <Layout>
+        <Layout className="h-screen">
           <Content
             style={{
               margin: "24px 16px",
@@ -87,4 +84,4 @@ const EmpDashboard: React.FC<{children: React.ReactNode}> = ({children}) => {
   );
 };
 
-export default EmpDashboard;
+export default AppLayout;

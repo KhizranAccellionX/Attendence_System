@@ -1,8 +1,7 @@
-import { Typography, Divider, Row, Card, Avatar, Col } from "antd";
+import { Typography, Divider, Row, Avatar, Col, Table } from "antd";
 import { FaArrowRightToBracket } from "react-icons/fa6";
 import { FaRegClock } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { fetchUserData } from "../../../services/userApis/userApis";
 import { UserData } from "../../types";
 const { Title } = Typography;
@@ -18,6 +17,62 @@ export const Profile = () => {
 
     fetchData();
   }, []);
+  const dataSource = [
+    {
+      date: "28 May 2024",
+      status: "Pending",
+      checkInTime: "9:00 A.M",
+      checkOutTime: "6:00 P.M",
+    },
+    {
+      date: "29 May 2024",
+      status: "Approved",
+      checkInTime: "8:30 A.M",
+      checkOutTime: "5:30 P.M",
+    },
+    {
+      date: "29 May 2024",
+      status: "Approved",
+      checkInTime: "8:30 A.M",
+      checkOutTime: "5:30 P.M",
+    },
+    // Add more data as needed
+  ];
+
+  const columns = [
+    {
+      title: "Data",
+      dataIndex: "data",
+      key: "data",
+      render: (text: string, record: any) => (
+        <Row className="flex justify-around border-2 border-black">
+          <Col span={6}>
+            <div className="mr-2 bg-slate-300 p-2 rounded-lg">
+              <div className="flex justify-between items-center w-full mb-4">
+                <span className="flex items-center">
+                  <FaRegClock className="mr-1" />
+                  {record.date}
+                </span>
+                <div className="border-2 border-white bg-white font-semibold text-slate-500 rounded-full p-1">
+                  {record.status}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center w-full textslate=500 mb-4">
+                <span>Check In Time</span>
+                <span>Check Out Time</span>
+              </div>
+              <div className="flex justify-between items-center w-full font-bold">
+                <span>{record.checkInTime}</span>
+                <span>{record.checkOutTime}</span>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      ),
+    },
+  ];
+
   return (
     <div>
       <div className="bg-slate-200 pb-4">
@@ -106,7 +161,7 @@ export const Profile = () => {
           </div>
         </div>
         <Divider />
-        <Row className="flex justify-around">
+        {/* <Row className="flex justify-around">
           <Col span={6}>
             <div className="mr-2 bg-slate-300 p-2 rounded-lg">
               <div className="flex justify-between items-center !w-full mb-4">
@@ -173,7 +228,14 @@ export const Profile = () => {
               </div>
             </div>
           </Col>
-        </Row>
+        </Row> */}
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          bordered
+          pagination={false}
+        />
+        ;
       </div>
     </div>
   );

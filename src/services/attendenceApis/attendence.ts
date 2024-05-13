@@ -23,3 +23,16 @@ export const CheckOutApi = async () => {
     console.error("checkout error", error);
   }
 };
+
+export const fetchUserAttendance = async () => {
+  try {
+    const response = await attendanceAPI.get(
+      `${process.env.REACT_APP_API_URL}/userattendance`,
+      {}
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("checkin error", error);
+  }
+};
